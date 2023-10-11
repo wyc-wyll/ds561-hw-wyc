@@ -24,10 +24,12 @@ def getFile(request: flask.Request):
     publisher = pubsub_v1.PublisherClient()
     topic_path = publisher.topic_path(project_id, topic_id)
 
-    ip = request.headers["X-Forward-For"]
-    payload = {'key': '8D92129DF050115AF4E3AAE652584062', 'ip': str(ip)}
-    location_result = requests.get("https://api.ip2location.io/", params=payload)
-    country = location_result.json().get("country_name")
+    # ip = request.headers["X-Forward-For"]
+    # payload = {'key': '8D92129DF050115AF4E3AAE652584062', 'ip': str(ip)}
+    # location_result = requests.get("https://api.ip2location.io/", params=payload)
+    # country = location_result.json().get("country_name")
+
+    country = request.headers["X-country"]
 
     if (validate_country(country=country)):
 
