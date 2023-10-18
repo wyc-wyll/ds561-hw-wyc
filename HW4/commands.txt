@@ -1,0 +1,35 @@
+
+# check the IP address
+    gcloud compute addresses describe hw4-vm1-ip
+
+# create http traffic allowance
+1. gcloud compute firewall-rules create default-allow-http-8080 \
+    --allow=tcp:8080 \
+    --target-tags http-server \
+    --description "Allow port 8080 access to http-server"
+
+# create vm and link vm to ip
+2. gcloud compute instances create hw4-vm-1 \
+    --service-account=ds561-wyc-5304@appspot.gserviceaccount.com \
+    --image-family=debian-10 \
+    --image-project=debian-cloud \
+    --machine-type=e2-medium \
+    --metadata-from-file startup-script="/Users/wylliamcheng/Desktop/BU/fall 2023/DS561/HW4/start_vm.sh" \
+    --zone=us-east1-b \
+    --tags=http-server
+
+# reserve a static IPV4 address
+3. gcloud compute addresses create hw4-vm1-ip --region=us-east1 --addresses=34.23.17.96
+
+# updating vm
+5. gcloud compute instances add-metadata hw4-vm-1 \
+    --zone=us-east1-b \
+    --metadata-from-file startup-script="/Users/wylliamcheng/Desktop/BU/fall 2023/DS561/HW4/start_vm.sh"
+
+
+
+# vm 2 http-client command
+6. python3 ./http-client.py -d 34.23.17.96 -b none -w none -n 100 -i 11000 -v -f -p 8080 
+
+# stress testing
+7. seq 1000000000000000000000000000000000000000000000000000000000000000000000000 | xargs -I{} -P100 python3 http-client.py -d 34.23.17.96 -b none -w none -n 1000 -i 11000 -p 8080 -f -v

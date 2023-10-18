@@ -1,0 +1,5 @@
+functions-framework==3.*
+Flask
+google-cloud-storage
+google-cloud-logging
+google-cloud-pubsub
