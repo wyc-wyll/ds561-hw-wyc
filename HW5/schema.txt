@@ -1,0 +1,25 @@
+1. Create IP table
+
+CREATE TABLE Banned_Country(
+    country varchar(255)
+);
+
+CREATE TABLE Request(
+    client_ip varchar(255),
+    country varchar(255),
+    gender varchar(255) CHECK (gender='Male' OR gender='Female'),
+    age varchar(255) CHECK (age='0-16' OR age='17-25' OR age='26-35' OR age='36-45' OR age='46-55' OR age='56-65' OR age='66-75' OR age='76+'),
+    income varchar(255) CHECK (income='0-10k' OR income='10k-20k' OR income='20k-40k' OR income='40k-60k' OR income='60k-100k' OR income='100k-150k' OR income='150k-250k' OR income='250k+'),
+    time_of_day varchar(255),
+    requested_file varchar(255)
+);
+
+
+
+CREATE TABLE Error_log(
+    time_of_day varchar(255),
+    requested_file varchar(255),
+    error_code int
+);
+
+INSERT INTO Banned_Country (country) VALUES ("North Korea"), ("Iran"), ("Cuba"), ("Myanmar"), ("Iraq"), ("Libya"), ("Sudan"), ("Zimbabwe"), ("Syria")

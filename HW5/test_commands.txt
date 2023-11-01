@@ -1,0 +1,19 @@
+1. curl http://34.23.17.96:8080/123.html -H "X-country: USA" -H "X-gender: Male" -H "X-age: 17-25" -H "X-income: 0-10k" -H "X-client-IP: 123.123.123.123" -H "X-time: 2023-10-30 06:00:00" -v
+
+
+
+2. curl http://34.23.17.96:8080/123.html -H "X-country: Iraq" -H "X-gender: Male" -H "X-age: 17-25" -H "X-income: 0-10k" -H "X-client-IP: 123.123.123.123" -H "X-time: 2023-10-30 06:00:00" -v
+
+
+
+3. python3 ./http-client.py -d 34.23.17.96 -b none -w none -n 200 -i 11000 -v -f -p 8080
+
+
+
+4. seq 2 | xargs -I {} -P 2 python3 ./http-client.py -d 34.23.17.96 -b none -w none -n 50000 -i 11000 -v -f -p 8080
+
+
+seq 2 | xargs -I {} -P 2 python3 ./http-client.py -d 34.23.17.96 -b hw2-ds561 -n 50000 -i 11000 -v -f -p 8080
+
+
+5. xargs -P 2 python3 ./http-client.py -d 34.23.17.96 -b none -w none -n 200 -i 11000 -v -f -p 8080
