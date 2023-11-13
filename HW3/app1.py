@@ -5,7 +5,7 @@ from google.cloud import logging
 from google.cloud import pubsub_v1
 import requests
 
-project_id = "ds561-wyc-5304"
+project_id = "ds561-wyc-f2023"
 topic_id = "forbidden-access-hw3-ds561"
 
 def validate_country(country: str) -> bool:
@@ -16,7 +16,7 @@ def getFile(request: flask.Request):
     path = request.path
     filename = path.split("/")[-1]
 
-    project_id = "ds561-wyc-5304"
+    project_id = "ds561-wyc-f2023"
     logging_client = logging.Client(project=project_id)
     logname = "HW3-DS561"
 

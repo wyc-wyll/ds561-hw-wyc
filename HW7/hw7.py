@@ -24,7 +24,7 @@ class MyOptions(PipelineOptions):
     # Define a custom pipeline option that specfies the Cloud Storage bucket.
     def _add_argparse_args(cls, parser):
         parser.add_argument("--output1", required=True)
-        parser.add_argument("--output2", required=True)
+        # parser.add_argument("--output2", required=True)
 
 options = MyOptions()
 
@@ -41,10 +41,10 @@ def run():
         countOutResult = countingOut | 'Extracting top 5' >> beam.combiners.Top.Of(5, key=lambda x: x[1])
         countOutResult | 'Output results' >> beam.io.WriteToText(options.output1, file_name_suffix=".txt")
 
-        countingInS1 = pureHtmlContent | 'Getting incoming count' >> beam.ParDo(ExtractIncomingLinkCount())
-        summed_countIn = countingInS1 | 'Summing Up The Incoming Count' >> beam.CombinePerKey(sum)
-        countInResult = summed_countIn | 'Extracting top 5' >> beam.combiners.Top.Of(5, key=lambda x: x[1])
-        countInResult | 'Output results' >> beam.io.WriteToText(options.output2, file_name_suffix=".txt")
+        # countingInS1 = pureHtmlContent | 'Getting incoming count' >> beam.ParDo(ExtractIncomingLinkCount())
+        # summed_countIn = countingInS1 | 'Summing Up The Incoming Count' >> beam.CombinePerKey(sum)
+        # countInResult = summed_countIn | 'Extracting top 5' >> beam.combiners.Top.Of(5, key=lambda x: x[1])
+        # countInResult | 'Output results' >> beam.io.WriteToText(options.output2, file_name_suffix=".txt")
 
 
 

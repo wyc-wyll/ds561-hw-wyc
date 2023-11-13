@@ -1,7 +1,7 @@
 from concurrent.futures import TimeoutError
 from google.cloud import pubsub_v1
 
-project_id = "ds561-wyc-5304"
+project_id = "ds561-wyc-f2023"
 sub_id = "hw3-permission-sub"
 
 subscriber = pubsub_v1.SubscriberClient()

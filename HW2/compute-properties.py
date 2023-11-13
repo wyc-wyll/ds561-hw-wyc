@@ -29,7 +29,7 @@ new_pageranks = [1/10000 for i in range(10000)]
 pageranks = np.array(pageranks)
 new_pageranks = np.array(new_pageranks)
 
-bucket_name = "hw2-ds561"
+bucket_name = "ds561-bucket"
 try:
     bucket = client.bucket(bucket_name)
 except google.api_core.exceptions.NotFound:
