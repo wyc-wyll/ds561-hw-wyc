@@ -6,6 +6,4 @@ sudo apt-get update
 sudo apt-get -y install python3 python3-pip
 python3 -m pip install google-cloud-pubsub
 
-gsutil cp gs://hw2-ds561/app2.py /app2.py
-
-
+gsutil cp gs://ds561-bucket/app2.py /app2.py

@@ -7,14 +7,14 @@ connector = Connector()
 
 project_id = "ds561-wyc-f2023"
 region = "us-east1"
-instance_name = "hw5--db"
+instance_name = "hw10"
 
 # initialize parameters
 INSTANCE_CONNECTION_NAME = f"{project_id}:{region}:{instance_name}" # i.e demo-project:us-central1:demo-instance
 print(f"Your instance connection name is: {INSTANCE_CONNECTION_NAME}")
 DB_USER = "root"
 DB_PASS = "454604"
-DB_NAME = "hw5"
+DB_NAME = "hw10-db"
 
 
 def getconn():
@@ -33,10 +33,10 @@ pool = sqlalchemy.create_engine(
     creator=getconn,
 )
 
-topic_id = "forbidden-access-hw3-ds561"
+topic_id = "forbidden-access-hw10"
 
 logging_client = logging.Client(project=project_id)
-logname = "HW4-DS561"
+logname = "HW10-DS561"
 
 logger = logging_client.logger(logname)
 
@@ -47,13 +47,47 @@ topic_path = publisher.topic_path(project_id, topic_id)
 
 methods = ["GET", "POST", "HEAD", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"]
 app = Flask(__name__)
+countries = ["North Korea", "Iran", "Cuba", "Myanmar", "Iraq", "Libya", "Sudan", "Zimbabwe", "Syria"]
+
+create_banned_country = sqlalchemy.text(
+    "CREATE TABLE IF NOT EXISTS Banned_Country"
+    "(country varchar(255));"
+)
+
+insert_country = sqlalchemy.text("INSERT INTO Banned_Country (country) VALUES (:country);")
+
+def validateCountryTable():
+    with pool.connect() as db_conn:
+        results = db_conn.execute(sqlalchemy.text("SELECT * FROM Banned_Country")).fetchall()
+        if len(results) < len(countries):
+            db_conn.execute(sqlalchemy.text("DELETE FROM Banned_Country;"))
+            for cty in countries:
+                db_conn.execute(insert_country, parameters={"country": cty})
+        db_conn.commit()
+
+create_request = sqlalchemy.text(
+    "CREATE TABLE IF NOT EXISTS Request"
+    "(client_ip varchar(255), country varchar(255), gender varchar(255) CHECK (gender='Male' OR gender='Female'),"
+    "age varchar(255) CHECK (age='0-16' OR age='17-25' OR age='26-35' OR age='36-45' OR age='46-55' OR age='56-65' OR age='66-75' OR age='76+'),"
+    "income varchar(255) CHECK (income='0-10k' OR income='10k-20k' OR income='20k-40k' OR income='40k-60k' OR income='60k-100k' OR income='100k-150k' OR income='150k-250k' OR income='250k+'),"
+    "time_of_day varchar(255), requested_file varchar(255));"
+)
+
+create_error_log = sqlalchemy.text(
+    "CREATE TABLE IF NOT EXISTS Error_log"
+    "(time_of_day varchar(255), requested_file varchar(255), error_code int);"
+)
+
+def validateTableExistence():
+    with pool.connect() as db_conn:
+        db_conn.execute(create_banned_country)
+        validateCountryTable()
+        db_conn.execute(create_request)
+        db_conn.execute(create_error_log)
+        db_conn.commit()
 
 insert_request = sqlalchemy.text(
     "INSERT INTO Request (client_ip, country, gender, age, income, time_of_day, requested_file) VALUES (:client_ip, :country, :gender, :age, :income, :time_of_day, :requested_file);",
-)
-
-insert_country = sqlalchemy.text(
-    "INSERT INTO Ban_status (country) VALUES (:country);",
 )
 
 insert_error = sqlalchemy.text(
@@ -61,10 +95,10 @@ insert_error = sqlalchemy.text(
 )
 
 def validate_country(country: str) -> bool:
-
     return country in ["North Korea", "Iran", "Cuba", "Myanmar", "Iraq", "Libya", "Sudan", "Zimbabwe", "Syria"]
 
 def insertRequestTable(client_ip: str, country: str, gender: str, age: str, income: str, time_of_day: str, requested_file: str):
+    validateTableExistence()
     with pool.connect() as db_conn:
         print("updating request list")
         db_conn.execute(insert_request, parameters={"client_ip": client_ip, "country": country, "gender": gender, "age": age, "income": income, "time_of_day": time_of_day, "requested_file": requested_file})
@@ -72,6 +106,7 @@ def insertRequestTable(client_ip: str, country: str, gender: str, age: str, inco
         db_conn.commit()
 
 def insertError_logTable(time_of_day: str, requested_file: str, error_code: int):
+    validateTableExistence()
     with pool.connect() as db_conn:
         print("updating error list")
         db_conn.execute(insert_error, parameters={"time_of_day": time_of_day, "requested_file": requested_file, "error_code": error_code})
@@ -115,7 +150,7 @@ def getFile(file):
     else:
         try:
             storage_client = storage.Client.create_anonymous_client()
-            bucket_name = "ds561-bucket"
+            bucket_name = "ds561-hw10-wyc"
 
             bucket = storage_client.bucket(bucket_name)
             blob = bucket.blob(file)

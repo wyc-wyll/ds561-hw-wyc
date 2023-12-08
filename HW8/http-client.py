@@ -140,17 +140,24 @@ def make_request(domain, port, country, ip, filename, use_ssl, ssl_context, foll
 
     headers = build_headers(country, ip)
     conn.request("GET", filename, headers=headers)
-    res = conn.getresponse()
-    data = res.read()
-    if verbose:
-        print(res.status, res.reason)
-        print(res.msg)
-        print(data)
-    if follow:
-        location_header = res.getheader('location')
-        if location_header is not None:
-            filename = urljoin(filename, location_header)
-            make_request(domain, country, ip, filename, use_ssl, ssl_context, follow, verbose)
+    try:
+        res = conn.getresponse()
+        data = res.read()
+        if verbose:
+            print(res.status, res.reason)
+            print(res.msg)
+            print(data)
+        if follow:
+            location_header = res.getheader('location')
+            if location_header is not None:
+                filename = urljoin(filename, location_header)
+                make_request(domain, country, ip, filename, use_ssl, ssl_context, follow, verbose)
+
+        ######################### Print Zone ##############################
+        print("Zone of Server: ", res.getheader('Zone'))    
+        ###################################################################
+    except:
+        print("Server collapsed") 
     conn.close()
                  
         

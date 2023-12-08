@@ -2,10 +2,11 @@ from concurrent.futures import TimeoutError
 from google.cloud import pubsub_v1
 
 project_id = "ds561-wyc-f2023"
-sub_id = "homework3-permission-sub"
+sub_id = "hw10-permission-sub"
+pub_id = "forbidden-access-hw10"
 
+publisher = pubsub_v1.PublisherClient()
 subscriber = pubsub_v1.SubscriberClient()
-
 subscription_path = subscriber.subscription_path(project_id, sub_id)
 
 def callback(message: pubsub_v1.subscriber.message.Message) -> None:

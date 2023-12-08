@@ -1,0 +1,18 @@
+{
+    "ResourceType":"sqladmin.v1beta4.database",
+    "ResourceErrorCode":"403",
+    "ResourceErrorMessage":{
+        "code":403,
+        "errors":[
+            {
+                "domain":"global",
+                "message":"The client is not authorized to make this request.",
+                "reason":"notAuthorized"
+            }
+        ],
+        "message":"The client is not authorized to make this request.",
+        "statusMessage":"Forbidden",
+        "requestPath":"https://www.googleapis.com/sql/v1beta4/projects/ds561-wyc-f2023/instances/hw10/databases",
+        "httpMethod":"POST"
+    }
+}

@@ -1,0 +1,7 @@
+flask
+google-cloud-storage
+google-cloud-pubsub
+google-cloud-logging
+flask_cors
+google-cloud-compute
+beautifulsoup4

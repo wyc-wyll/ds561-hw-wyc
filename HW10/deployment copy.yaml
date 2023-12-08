@@ -1,0 +1,193 @@
+# For a list of supported resources,
+# see https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types.
+resources:
+- type: sqladmin.v1beta4.database
+  name: hw10-db
+  properties:
+    name: hw10-db
+    instance: hw10
+    project: ds561-wyc-f2023
+  metadata:
+    dependsOn:
+    - hw10
+
+
+- type: compute.v1.instance
+  name: server-vm
+  properties:
+    # The properties of the resource depend on the type of resource. For a list
+    # of properties, see the API reference for the resource.
+    zone: us-east1-b
+    # Replace [MY_PROJECT] with your project ID
+    machineType: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/zones/us-east1-b/machineTypes/e2-medium
+    disks:
+    - deviceName: server-boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        # See a full list of image families at https://cloud.google.com/compute/docs/images#os-compute-support
+        # The format of the sourceImage URL is: https://www.googleapis.com/compute/v1/projects/[IMAGE_PROJECT]/global/images/family/[FAMILY_NAME]
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-11
+    # Replace [MY_PROJECT] with your project ID
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/global/networks/default
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT 
+    tags:
+      items: 
+      - "http-server"
+      - "https-server"
+    metadata:
+      items:
+      - key: "startup-script"
+        value: |
+          #! /bin/bash
+          echo "setting up"
+          sudo apt-get update
+          sudo apt-get -y install python3 python3-pip
+          python3 -m pip install flask
+          python3 -m pip install google-cloud-storage
+          python3 -m pip install google-cloud-pubsub
+          python3 -m pip install google-cloud-logging
+          python3 -m pip install flask_cors
+          python3 -m pip install functions-framework
+          python3 -m pip install pymysql
+          python3 -m pip install sqlalchemy
+          python3 -m pip install "cloud-sql-python-connector[pymysql]"
+          gsutil cp gs://ds561-hw10-wyc/server.py /server.py
+          gsutil cp gs://ds561-hw10-wyc/generate-content.py /generate.py
+          python3 ./generate.py
+          gsutil cp ./*.html gs://ds561-hw10-wyc/
+          python3 ./server.py
+      dependsOn:
+      - hw10
+    serviceAccounts:
+      - email: "888689802960-compute@developer.gserviceaccount.com"
+        scopes:
+        - "https://www.googleapis.com/auth/cloud-platform"
+
+- type: compute.v1.instance
+  name: httpclient-vm
+  properties:
+    # The properties of the resource depend on the type of resource. For a list
+    # of properties, see the API reference for the resource.
+    zone: us-east1-b
+    # Replace [MY_PROJECT] with your project ID
+    machineType: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/zones/us-east1-b/machineTypes/e2-medium
+    disks:
+    - deviceName: server-boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        # See a full list of image families at https://cloud.google.com/compute/docs/images#os-compute-support
+        # The format of the sourceImage URL is: https://www.googleapis.com/compute/v1/projects/[IMAGE_PROJECT]/global/images/family/[FAMILY_NAME]
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-11
+    # Replace [MY_PROJECT] with your project ID
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/global/networks/default
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT 
+    tags:
+      items: 
+      - "http-server"
+      - "https-server"
+    metadata:
+      items:
+      - key: "startup-script"
+        value: |
+          #! /bin/bash
+          echo "setting up"
+          sudo apt-get update
+          sudo apt-get -y install python3 python3-pip
+          gsutil cp gs://ds561-hw10-wyc/http-client.py /http-client.py
+      dependsOn:
+      - hw10
+    serviceAccounts:
+      - email: "888689802960-compute@developer.gserviceaccount.com"
+        scopes:
+        - "https://www.googleapis.com/auth/cloud-platform"
+
+- type: compute.v1.instance
+  name: listener-vm
+  properties:
+    # The properties of the resource depend on the type of resource. For a list
+    # of properties, see the API reference for the resource.
+    zone: us-east1-b
+    # Replace [MY_PROJECT] with your project ID
+    machineType: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/zones/us-east1-b/machineTypes/e2-medium
+    disks:
+    - deviceName: server-boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        # See a full list of image families at https://cloud.google.com/compute/docs/images#os-compute-support
+        # The format of the sourceImage URL is: https://www.googleapis.com/compute/v1/projects/[IMAGE_PROJECT]/global/images/family/[FAMILY_NAME]
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-11
+    # Replace [MY_PROJECT] with your project ID
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/ds561-wyc-f2023/global/networks/default
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT 
+    tags:
+      items: 
+      - "http-server"
+      - "https-server"
+    metadata:
+      items:
+      - key: "startup-script"
+        value: |
+          #! /bin/bash
+          echo "setting up"
+          sudo apt-get update
+          sudo apt-get -y install python3 python3-pip
+          gsutil cp gs://ds561-hw10-wyc/listener.py /listener.py
+      dependsOn:
+      - hw10
+    serviceAccounts:
+      - email: "888689802960-compute@developer.gserviceaccount.com"
+        scopes:
+        - "https://www.googleapis.com/auth/cloud-platform"
+    
+
+- type: gcp-types/pubsub-v1:projects.subscriptions
+  name: hw10-permission-sub
+  properties:
+    subscription: hw10-permission-sub
+    topic: projects/ds561-wyc-f2023/topics/forbidden-access-hw10
+  metadata:
+    dependsOn:
+    - forbidden-access-hw10
+
+- type: sqladmin.v1beta4.instance
+  name: hw10
+  properties:
+    name: hw10
+    region: us-east1
+    databaseVersion: MYSQL_5_7
+    serviceAccountEmailAddress: "wycheng@bu.edu"
+    settings:
+      tier: db-n1-standard-4
+      backupConfiguration:
+        enabled: true
+        startTime: 00:00
+      ipConfiguration:
+        ipv4Enabled: true
+      userLabels:
+        environment: production
+    instanceType: CLOUD_SQL_INSTANCE
+    project: ds561-wyc-f2023
+    rootPassword: 454604
+
+- type: gcp-types/pubsub-v1:projects.topics
+  name: forbidden-access-hw10
+  properties:
+    topic: forbidden-access-hw10

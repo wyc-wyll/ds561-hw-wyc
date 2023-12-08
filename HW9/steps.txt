@@ -1,0 +1,65 @@
+1. Create A Folder (hw9-docker) locally containing new_server.py, startup.sh, and Dockerfile on Google Cloud Shell
+
+2. Create a registry artifacts by running 
+// gcloud artifacts repositories create hw9-image --repository-format=docker --location=us-central1
+
+3. Build the artifacts image by running
+// gcloud builds submit --region=us-central1 --tag us-central1-docker.pkg.dev/ds561-wyc-f2023/hw9-image/hw9-image:tag1
+
+4. Create the cluster by running 
+// gcloud container clusters create-auto hw9-server-cluster --location=us-central1
+
+4.1 Configure Cluster to be used
+// gcloud container clusters get-credentials hw9-server-cluster --location us-central1
+
+4.2 
+// gcloud container clusters update hw9-server-cluster --region=us-central1 --workload-pool=ds561-wyc-f2023.svc.id.goog
+
+4.3
+// gcloud container clusters get-credentials hw9-server-cluster \
+    --region=us-central1
+
+4.4 
+// kubectl create namespace hw9-namespace
+
+4.5
+// kubectl create serviceaccount hw9-service-account \
+    --namespace hw9-namespace
+
+4.6
+// gcloud iam service-accounts add-iam-policy-binding hw9-ke-sa@ds561-wyc-f2023.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:ds561-wyc-f2023.svc.id.goog[hw9-namespace/hw9-service-account]"
+    --namespace hw9-namespace
+
+4.7
+// kubectl annotate serviceaccount hw9-service-account \
+    --namespace hw9-namespace \
+    iam.gke.io/gcp-service-account=hw9-ke-sa@ds561-wyc-f2023.iam.gserviceaccount.com
+
+5. Deploy the cluster by running
+
+// kubectl create deployment hw9-server --image=us-central1-docker.pkg.dev/ds561-wyc-f2023/hw9-image/hw9-image:tag1
+// kubectl get deployment hw9-server -o yaml > myconfig.yaml
+
+6. Expose the deployment by running
+// kubectl expose deployment hw9-server --type LoadBalancer --port 80 --target-port 8080
+
+7. Wait for the container to setup + check status of the container by running
+// kubectl get pods
+
+8. Get External IP by running
+// kubectl get service hw9-server
+
+
+
+
+
+ie. 
+
+
+1. test command http-client
+// python3 ./http-client.py -d 34.123.199.1 -b none -w none -n 10 -i 11000 -v -f -p 80
+
+
+
